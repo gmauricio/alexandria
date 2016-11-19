@@ -1,0 +1,14 @@
+{
+  "name": "alexandria",
+  "version": "0.1.0",
+  "description": "Calibre Servers ebook search",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/gmauricio/alexandria",
+  "author": "Germán Mauricio Muñoz",
+  "devDependencies": {
+    "electron": "^1.4.7"
+  }
+}
