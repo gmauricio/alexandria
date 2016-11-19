@@ -4,11 +4,15 @@
   "description": "Calibre Servers ebook search",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "elm": "elm make Main.elm --output elm.js || true",
+    "elm:watch": "chokidar '**/*.elm' -c 'npm run elm'",
+    "start": "electron main.js",
+    "watch": "npm run start & npm run elm:watch & wait"
   },
   "repository": "https://github.com/gmauricio/alexandria",
   "author": "Germán Mauricio Muñoz",
   "devDependencies": {
+    "chokidar": "^1.6.1",
     "electron": "^1.4.7"
   }
 }
