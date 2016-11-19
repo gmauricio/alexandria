@@ -2,7 +2,7 @@
 
 Alexandria is an application to search ebooks across several [Calibre content servers](https://manual.calibre-ebook.com/generated/en/calibre-server.html)
 
-Written in Elm.
+Built with Electron in Elm.
 
 ## How to run and develop
 
