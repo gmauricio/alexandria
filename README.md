@@ -1,6 +1,8 @@
-# Alexandria
+# The Library of Babel
 
-Alexandria is an application to search ebooks across several [Calibre content servers](https://manual.calibre-ebook.com/generated/en/calibre-server.html)
+The Library of Babel is an application to search ebooks across several [Calibre content servers](https://manual.calibre-ebook.com/generated/en/calibre-server.html)
+
+
 
 Built with Electron in Elm.
 
