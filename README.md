@@ -11,5 +11,5 @@ Built with Electron in Elm.
 * `npm install`
 * `npm i -g electron`
 * `npm i -g elm`
-* `npm i -g chokidar`
+* `npm i -g chokidar-cli`
 * `npm run watch`
