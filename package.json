@@ -1,15 +1,15 @@
 {
-  "name": "alexandria",
+  "name": "library-of-babel",
   "version": "0.1.0",
-  "description": "Calibre Servers ebook search",
+  "description": "Calibre content servers search",
   "main": "main.js",
   "scripts": {
-    "elm": "elm make Main.elm --output elm.js || true",
-    "elm:watch": "chokidar '**/*.elm' -c 'npm run elm'",
+    "elm": "elm make src/Main.elm --output elm.js || true",
+    "elm:watch": "chokidar 'src/**/*.elm' -c 'npm run elm'",
     "start": "electron main.js",
     "watch": "npm run start & npm run elm:watch & wait"
   },
-  "repository": "https://github.com/gmauricio/alexandria",
+  "repository": "https://github.com/gmauricio/library-of-babel.git",
   "author": "Germán Mauricio Muñoz",
   "devDependencies": {
     "chokidar": "^1.6.1",

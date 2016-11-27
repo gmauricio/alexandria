@@ -6,4 +6,4 @@ let container = document.getElementById('container')
 
 // start the elm app in the container
 // and keep a reference for communicating with the app
-let feldspar = Elm.Main.embed(container)
+let app = Elm.Main.embed(container)
