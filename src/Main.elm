@@ -1,5 +1,5 @@
 import Html exposing (Html, div, text, h1, ul, li, img, span, a, p, i)
-import Html.Attributes exposing (class, src, href)
+import Html.Attributes exposing (class, src, href, placeholder)
 import Html.Events exposing (onClick, onInput)
 import SemanticUi exposing (..)
 import HtmlResultParser exposing (..)
@@ -56,17 +56,14 @@ view model =
   div []
     [ h1 [ class "ui center aligned header" ] [ text "The Libary of Babel" ]
     , container
-        [ row []
+        [ row
             [ col "twelve"
-                [ input []
-                    |> placeholder "search..."
-                    |> events [ onInput SearchText]
+                [ input [ placeholder "search...", onInput SearchText ]
                     |> fluid
                     |> render
                 ]
             , col "four"
                 [  button "search"
-                    |> events [onClick Search]
                     |> render
                 ]
             ]
@@ -110,32 +107,6 @@ parseExtension url =
     case ext of
       Just e -> e
       Nothing -> ""
-
-
-items : List (Html msg) -> Html msg
-items content =
-  div [ class "ui divided items" ] content
-
-item : Html msg -> Html msg -> Html msg
-item img content =
-  div [ class "item" ]
-    [ img
-    , content
-    ]
-
-itemImg : String -> Html msg
-itemImg imgSrc =
-  div [ class "ui tiny image" ]
-    [ img [ src imgSrc ] []
-    ]
-
-itemContent header meta description extra =
-  div [ class "content" ]
-    [ a [ class "header" ] [ text header ]
-    , div [ class "meta" ] [ span [] [ text meta ] ]
-    , div [ class "description" ] [ p [] [ text description ] ]
-    , div [ class "extra" ] extra
-    ]
 
 testHtml = """
 <html>
