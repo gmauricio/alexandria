@@ -7,7 +7,8 @@ import HtmlParser
 import HtmlParser.Util exposing (..)
 
 type alias Result =
-  { title: String
+  { host: String
+  , title: String
   , description: String
   , urls: List String
   , thumbUrl: String
@@ -37,7 +38,7 @@ getResult node =
     urls = getUrls node
     thumbUrl = getThumbUrl node
   in
-    Result title description urls thumbUrl
+    Result "" title description urls thumbUrl
 
 
 getUrls : List HtmlParser.Node -> List String
@@ -81,6 +82,3 @@ getThumbUrl node =
     case List.head urls of
       Just url -> url
       Nothing -> ""
-
-
--- http://72.191.219.159/mobile?num=25&search=cyber&sort=title&order=ascending
