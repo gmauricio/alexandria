@@ -15,30 +15,30 @@ type alias Result =
   }
 
 
-parse : String -> List Result
-parse html =
+parse : String -> String -> List Result
+parse host html =
   HtmlParser.parse html
     |> getElementById "listing"
     |> getElementsByTagName "tr"
-    |> getResults
+    |> getResults host
 
 
-getResults : List HtmlParser.Node -> List Result
-getResults listing =
+getResults : String -> List HtmlParser.Node -> List Result
+getResults host listing =
   listing
     |> mapElements
-      (\_ _ tr -> getResult tr)
+      (\_ _ tr -> getResult host tr)
 
 
-getResult : List HtmlParser.Node -> Result
-getResult node =
+getResult : String -> List HtmlParser.Node -> Result
+getResult host node =
   let
     title = getTitle node
     description = getDescription node
     urls = getUrls node
     thumbUrl = getThumbUrl node
   in
-    Result "" title description urls thumbUrl
+    Result host title description urls thumbUrl
 
 
 getUrls : List HtmlParser.Node -> List String

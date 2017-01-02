@@ -33,7 +33,7 @@ init =
 type Msg
   = SearchText String
   | Search
-  | NewSearchResults (Result.Result Http.Error String)
+  | NewSearchResults String (Result.Result Http.Error String)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -42,9 +42,9 @@ update msg model =
       ({ model | searchText = text }, Cmd.none)
     Search ->
       ({ model | searching = True, results = [] }, searchEverywhere model.searchText)
-    NewSearchResults (Ok html) ->
-      ({ model | results = model.results ++ parse html, searching = False }, Cmd.none)
-    NewSearchResults (Err _) ->
+    NewSearchResults host (Ok html) ->
+      ({ model | results = model.results ++ parse host html, searching = False }, Cmd.none)
+    NewSearchResults host (Err _) ->
       (model, Cmd.none)
 
 
@@ -130,7 +130,7 @@ search text host =
     request =
       Http.getString url
   in
-    Http.send NewSearchResults request
+    Http.send (NewSearchResults host) request
 
 
 hosts : List String
