@@ -103,7 +103,12 @@ size size = class (sizeToString size)
     input [] |> fluid
 -}
 fluid : Element msg -> Element msg
-fluid = class "fluid"
+fluid input =
+  let
+    el = \attrs _ ->
+      H.div [ A.class "ui fluid input" ] [ H.input input.attrs [] ]
+  in
+    Element el input.attrs []
 
 sizeToString : Size -> String
 sizeToString size =
@@ -126,7 +131,7 @@ input : List (Attribute msg) -> Element msg
 input attrs =
   let
     el = \attrs _ ->
-      H.div [ A.class "ui icon input" ] [ H.input attrs [] ]
+      H.div [ A.class "ui input" ] [ H.input attrs [] ]
   in
     Element el attrs []
 
