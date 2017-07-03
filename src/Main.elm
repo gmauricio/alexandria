@@ -4,6 +4,10 @@ import Html.Events exposing (onClick, onInput)
 import Http
 import SemanticUi exposing (..)
 import HtmlResultParser exposing (..)
+import RemoteData exposing (WebData)
+import Json.Encode as Encode
+import Json.Decode as Decode
+import Json.Decode.Pipeline exposing (decode, required)
 
 main =
   Html.program
@@ -18,14 +22,14 @@ main =
 
 type alias Model =
   { searchText : String,
-    results: List HtmlResultParser.Result,
+    results: WebData (List SearchResult),
     searching: Bool
   }
 
 
 init : (Model, Cmd Msg)
 init =
-  (Model "" [] False, Cmd.none)
+  (Model "" RemoteData.NotAsked False, Cmd.none)
 
 
 -- UPDATE
@@ -33,7 +37,7 @@ init =
 type Msg
   = SearchText String
   | Search
-  | NewSearchResults String (Result.Result Http.Error String)
+  | NewSearchResults (WebData (List SearchResult))
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -41,11 +45,9 @@ update msg model =
     SearchText text ->
       ({ model | searchText = text }, Cmd.none)
     Search ->
-      ({ model | searching = True, results = [] }, searchEverywhere model.searchText)
-    NewSearchResults host (Ok html) ->
-      ({ model | results = model.results ++ parse host html, searching = False }, Cmd.none)
-    NewSearchResults host (Err _) ->
-      (model, Cmd.none)
+      ({ model | results = RemoteData.Loading, searching = True }, searchEverywhere model.searchText)
+    NewSearchResults response ->
+      ({ model | results = response, searching = False }, Cmd.none)
 
 
 -- SUBSCRIPTIONS
@@ -78,14 +80,28 @@ view model =
             ]
         ]
     , container
-      [ col "sixteen" [ showResultList model.results ]
+      [ col "sixteen" [ showResultList (model.results) ]
       ]
     ]
 
 
-showResultList : List HtmlResultParser.Result -> Html Msg
-showResultList list =
-  items (List.map (\result -> showResult result ) list)
+showResultList : WebData (List SearchResult) -> Html Msg
+showResultList response =
+  case response of
+    RemoteData.NotAsked ->
+      text ""
+
+    RemoteData.Loading ->
+      text "Loading..."
+
+    RemoteData.Success list ->
+      let
+        results = List.concatMap (\result -> parse result.host result.html ) list
+      in
+        items (List.map (\result -> showResult result ) results)
+
+    RemoteData.Failure error ->
+      text (toString error)
 
 
 showResult : HtmlResultParser.Result -> Html Msg
@@ -125,55 +141,36 @@ search : String -> String -> Cmd Msg
 search text host =
   let
     url =
-      "http://" ++ host ++ "/mobile?num=9999999&search=" ++ text ++ "&sort=title&order=ascending"
-
-    request =
-      Http.getString url
+      "http://" ++ host ++ "/search"
+    searchRequest =
+      Encode.object [ ("text", Encode.string text) ]
   in
-    Http.send (NewSearchResults host) request
-
+    Http.post url (Http.jsonBody searchRequest) searchResultsDecoder
+      |> RemoteData.sendRequest
+      |> Cmd.map NewSearchResults
 
 hosts : List String
 hosts =
   [
-    "72.191.219.159",
-    "23.94.123.28:8080",
-    "24.28.154.227:8080",
-    "211.181.142.155",
-    "24.60.64.82:8080",
-    "24.60.64.82:8080",
-    "24.117.20.91",
-    "24.117.20.91",
-    "24.14.243.46:8080",
-    "24.183.188.250:8081",
-    "41.86.178.42:8080",
-    "50.66.185.122:8000",
-    "50.88.7.19",
-    "50.170.111.245:8080",
-    "50.186.64.134",
-    "52.43.215.155",
-    "52.64.177.67",
-    "69.69.164.139:8888",
-    "70.70.158.63",
-    "71.90.204.102",
-    "73.164.30.34:8080",
-    "74.129.250.46:8888",
-    "75.19.8.28:8080",
-    "96.51.188.58:8080",
-    "98.214.170.70",
-    "98.232.181.142:8787",
-    "104.50.8.212:8080",
-    "107.170.128.62:8080",
-    "108.63.56.243:9080",
-    "118.208.243.87/category/allbooks",
-    "119.236.134.86",
-    "137.74.112.209",
-    "217.35.162.117/",
-    "173.48.114.20:8000",
-    "173.94.108.253",
-    "ebooks.wsd.net:8080",
-    "184.100.235.173:8080",
-    "198.199.7.10",
-    "traviata.dyndns.org:2208",
-    "203.160.127.78:8080"
+    "localhost:8000"
   ]
+
+type alias SearchRequest =
+  { text: String
+  }
+
+type alias SearchResult =
+  { host: String,
+    html : String
+  }
+
+searchResultsDecoder : Decode.Decoder (List SearchResult)
+searchResultsDecoder =
+    Decode.list searchResultDecoder
+
+
+searchResultDecoder : Decode.Decoder SearchResult
+searchResultDecoder =
+    decode SearchResult
+      |> required "host" Decode.string
+      |> required "html" Decode.string

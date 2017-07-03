@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "build": "webpack",
+    "server": "node server.js",
     "client": "webpack-dev-server --port 3000"
   },
   "repository": "https://github.com/gmauricio/library-of-babel.git",
