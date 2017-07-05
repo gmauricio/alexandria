@@ -1,7 +1,7 @@
 'use strict'
 
 
-require('../lib/semantic.min.css');
+require('semantic-ui-css/semantic.min.css');
 
 // Require index.html so it gets copied to dist
 require('./index.html');

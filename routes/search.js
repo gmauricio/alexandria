@@ -1,5 +1,6 @@
 const request = require('request');
-var utf8 = require('utf8');
+const utf8 = require('utf8');
+const Parser = require('../lib/parser')
 
 module.exports = function(app, db) {
 	app.use(function(req, res, next) {
@@ -13,12 +14,13 @@ module.exports = function(app, db) {
 		const host = "72.191.219.159";
 		const url = "http://" + host + "/mobile?num=9999999&search=" + utf8.encode(text) +  "&sort=title&order=ascending";
 		request.get(url,null, (err, response, html) => {
+			const parser = Parser(html);
 			if (err) {
 				console.log(err);
 				res.status(500).json({ message: err.message })
 			}
 			if (response.statusCode === 200 ) {
-				res.json([ { host, html } ])
+				res.json([ { host, html, results: parser.getResults() } ])
 			} else {
 				console.log('status', response.statusCode);
 				res.status(500).json({ message: 'Unknown error' })
