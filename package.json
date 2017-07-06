@@ -10,10 +10,6 @@
   },
   "repository": "https://github.com/gmauricio/library-of-babel.git",
   "author": "Germán Mauricio Muñoz",
-  "devDependencies": {
-    "chokidar": "^1.6.1",
-    "webpack": "^2.2.0-rc.4"
-  },
   "dependencies": {
     "body-parser": "^1.17.2",
     "cheerio": "^1.0.0-rc.2",
