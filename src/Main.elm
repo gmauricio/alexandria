@@ -3,12 +3,12 @@ import Html.Attributes exposing (class, src, href, placeholder)
 import Html.Events exposing (onClick, onInput)
 import Http
 import SemanticUi exposing (..)
-import HtmlResultParser exposing (..)
 import RemoteData exposing (WebData)
 import Json.Encode as Encode
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
 
+main : Program Never Model Msg
 main =
   Html.program
     { init = init
@@ -45,7 +45,7 @@ update msg model =
     SearchText text ->
       ({ model | searchText = text }, Cmd.none)
     Search ->
-      ({ model | results = RemoteData.Loading, searching = True }, searchEverywhere model.searchText)
+      ({ model | results = RemoteData.Loading, searching = True }, search model.searchText)
     NewSearchResults response ->
       ({ model | results = response, searching = False }, Cmd.none)
 
@@ -95,16 +95,13 @@ showResultList response =
       text "Loading..."
 
     RemoteData.Success list ->
-      let
-        results = List.concatMap (\result -> parse result.host result.html ) list
-      in
-        items (List.map (\result -> showResult result ) results)
+      items (List.map (\result -> showResult result ) list)
 
     RemoteData.Failure error ->
       text (toString error)
 
 
-showResult : HtmlResultParser.Result -> Html Msg
+showResult : SearchResult -> Html Msg
 showResult result =
   let
     thumbUrl = "http://" ++ result.host ++ result.thumbUrl
@@ -134,14 +131,11 @@ parseExtension url =
       Nothing -> ""
 
 
-searchEverywhere : String -> Cmd Msg
-searchEverywhere text = Cmd.batch (List.map (search text) hosts)
-
-search : String -> String -> Cmd Msg
-search text host =
+search : String -> Cmd Msg
+search text =
   let
     url =
-      "http://" ++ host ++ "/search"
+      "http://localhost:8000/search"
     searchRequest =
       Encode.object [ ("text", Encode.string text) ]
   in
@@ -149,28 +143,29 @@ search text host =
       |> RemoteData.sendRequest
       |> Cmd.map NewSearchResults
 
-hosts : List String
-hosts =
-  [
-    "localhost:8000"
-  ]
 
 type alias SearchRequest =
   { text: String
   }
 
 type alias SearchResult =
-  { host: String,
-    html : String
+  {
+    host: String
+  , title: String
+  , description: String
+  , urls: List String
+  , thumbUrl: String
   }
 
 searchResultsDecoder : Decode.Decoder (List SearchResult)
 searchResultsDecoder =
-    Decode.list searchResultDecoder
-
+  Decode.list searchResultDecoder
 
 searchResultDecoder : Decode.Decoder SearchResult
 searchResultDecoder =
-    decode SearchResult
-      |> required "host" Decode.string
-      |> required "html" Decode.string
+  decode SearchResult
+    |> required "host" Decode.string
+    |> required "title" Decode.string
+    |> required "description" Decode.string
+    |> required "urls" (Decode.list Decode.string)
+    |> required "thumbUrl" Decode.string
