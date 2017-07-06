@@ -7,7 +7,8 @@
     "start": "node server.js",
     "build": "webpack",
     "server": "node server.js",
-    "client": "webpack-dev-server --port 3000"
+    "client": "webpack-dev-server --port 3000",
+    "postinstall": "npm run build"
   },
   "repository": "https://github.com/gmauricio/library-of-babel.git",
   "author": "Germán Mauricio Muñoz",
