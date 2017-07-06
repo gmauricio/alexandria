@@ -4,6 +4,7 @@
   "description": "Calibre content servers search",
   "main": "main.js",
   "scripts": {
+    "start": "node server.js",
     "build": "webpack",
     "server": "node server.js",
     "client": "webpack-dev-server --port 3000"
