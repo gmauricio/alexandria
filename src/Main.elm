@@ -8,9 +8,9 @@ import Json.Encode as Encode
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
 
-main : Program Never Model Msg
+main : Program Config Model Msg
 main =
-  Html.program
+  Html.programWithFlags
     { init = init
     , view = view
     , update = update
@@ -21,16 +21,21 @@ main =
 -- MODEL
 
 type alias Model =
-  { searchText : String,
+  { apiHost: String,
+    searchText : String,
     results: WebData (List SearchResult),
     searching: Bool
   }
 
 
-init : (Model, Cmd Msg)
-init =
-  (Model "" RemoteData.NotAsked False, Cmd.none)
+init : Config -> (Model, Cmd Msg)
+init flags =
+  (Model flags.apiHost "" RemoteData.NotAsked False, Cmd.none)
 
+
+type alias Config =
+  { apiHost : String
+  }
 
 -- UPDATE
 
@@ -45,7 +50,7 @@ update msg model =
     SearchText text ->
       ({ model | searchText = text }, Cmd.none)
     Search ->
-      ({ model | results = RemoteData.Loading, searching = True }, search model.searchText)
+      ({ model | results = RemoteData.Loading, searching = True }, search model.apiHost model.searchText)
     NewSearchResults response ->
       ({ model | results = response, searching = False }, Cmd.none)
 
@@ -131,11 +136,11 @@ parseExtension url =
       Nothing -> ""
 
 
-search : String -> Cmd Msg
-search text =
+search : String -> String -> Cmd Msg
+search host text =
   let
     url =
-      "http://localhost:8000/search"
+      host ++ "/search"
     searchRequest =
       Encode.object [ ("text", Encode.string text) ]
   in

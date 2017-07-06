@@ -13,4 +13,4 @@ const container = document.getElementById('container')
 
 // start the elm app in the container
 // and keep a reference for communicating with the app
-const app = Elm.Main.embed(container)
+const app = Elm.Main.embed(container, { apiHost: process.env.API_BASE_URL || 'http://localhost:8000' })
